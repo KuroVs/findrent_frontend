@@ -57,36 +57,53 @@ function AmenitiesPage() {
                         {amenities.length} registros
                     </span>
                 </h1>
-                <button className="border px-4 py-2 rounded text-sm hover:bg-gray-50">
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
                     + Nueva amenidad
                 </button>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-                {amenities.map(amenity => (
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                {/* Header de la caja */}
+                <div className="flex px-4 py-2 bg-gray-50 border-b border-gray-200">
+                    <span className="flex-1 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        Nombre / Descripción
+                    </span>
+                    <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        Acciones
+                    </span>
+                </div>
+
+                {/* Filas */}
+                {amenities.map((amenity, index) => (
                     <div
                         key={amenity.id}
-                        className="flex items-center gap-3 border rounded-xl px-4 py-3 bg-white"
+                        className={`flex items-center gap-3 px-4 py-3 ${
+                            index < amenities.length - 1 ? 'border-b border-gray-100' : ''
+                        }`}
                     >
                         <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-                        <div>
-                            <p className="font-medium text-sm">{amenity.name}</p>
-                            <p className="text-xs text-gray-500">{amenity.description}</p>
+                        <div className="flex-1">
+                            <span className="font-medium text-sm text-gray-900">{amenity.name}</span>
+                            <span className="text-xs text-gray-500 ml-2">{amenity.description}</span>
                         </div>
-                        <div className="ml-4 flex gap-2">
-                            <button className="text-xs border px-2 py-1 rounded hover:bg-gray-50">
-                                ✎
+                        
+                        <div className="flex gap-2">
+                            <button className="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-md hover:bg-gray-50">
+                                ✎ Editar
                             </button>
-                            
-                            <button 
-                            onClick={() => handleDeleteClick(amenity)}
-                            className="text-xs border border-red-200 text-red-500 px-2 py-1 rounded hover:bg-red-50">
-                                ✕
+                            <button
+                                onClick={() => handleDeleteClick(amenity)}
+                                className="text-xs border border-red-200 text-red-500 px-3 py-1 rounded-md hover:bg-red-50"
+                            >
+                                ✕ Eliminar
                             </button>
                         </div>
                     </div>
-                ))}
-            </div>
+                        
+                    ))}
+                </div>
+
+            
             <ConfirmDialog
                 isOpen={confirmOpen}
                 onConfirm={handleConfirmDelete}

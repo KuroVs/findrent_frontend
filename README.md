@@ -9,26 +9,27 @@ Admin panel for real estate property management. Built as a frontend portfolio p
 - **HTTP Client:** Fetch API
 
 ## 📁 Project Structure
-findrent_frontend/
-├── src/
-│   ├── components/
-│   │   ├── Sidebar.jsx
-│   │   ├── Header.jsx
-│   │   ├── ConfirmDialog.jsx
-│   │   └── Toast.jsx
-│   ├── pages/
-│   │   ├── AmenitiesPage.jsx
-│   │   ├── OwnersPage.jsx
-│   │   └── PropertiesPage.jsx
-│   ├── services/
-│   │   ├── api.js
-│   │   ├── amenities.service.js
-│   │   ├── owners.service.js
-│   │   └── properties.service.js
-│   ├── App.jsx
-│   └── main.jsx
-├── index.html
-└── vite.config.js
+    
+    findrent_frontend/
+    ├── src/
+    │   ├── components/
+    │   │   ├── Sidebar.jsx
+    │   │   ├── Header.jsx
+    │   │   ├── ConfirmDialog.jsx
+    │   │   └── Toast.jsx
+    │   ├── pages/
+    │   │   ├── AmenitiesPage.jsx
+    │   │   ├── OwnersPage.jsx
+    │   │   └── PropertiesPage.jsx
+    │   ├── services/
+    │   │   ├── api.js
+    │   │   ├── amenities.service.js
+    │   │   ├── owners.service.js
+    │   │   └── properties.service.js
+    │   ├── App.jsx
+    │   └── main.jsx
+    ├── index.html
+    └── vite.config.js
 
 ## 🗄️ Pages
 | Page | Description |
