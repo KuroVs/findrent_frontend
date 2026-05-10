@@ -1,10 +1,24 @@
+import { useLocation } from 'react-router-dom'
+
+const names = [
+    { path: '/properties', label: 'Propiedades' },
+    { path: '/owners', label: 'Propietarios' },
+    { path: '/amenities', label: 'Amenidades' },
+]
+
+
 function Header() {
+    const location = useLocation()
+    const currentPage = names.find(link => link.path === location.pathname)
+
     return (
         <header className="flex items-center justify-between px-6 h-14 bg-white shrink-0 border-b border-gray-300">
-        
             <div>
-                <div className="text-sm font-medium text-gray-800">Panel</div>
-                <div className="text-xs text-gray-400">FindRent / Panel</div>
+                
+                <div className="text-sm font-medium text-gray-800"> {currentPage?.label}</div>
+                <div className="text-xs text-gray-400">FindRent /  {currentPage?.label}</div>
+                
+                    
             </div>
             <div className="flex items-center gap-3">
                 <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-600">

@@ -5,6 +5,7 @@ function AmenityModal({ isOpen, onClose, onSubmit, amenity }) {
 
     useEffect(() => {
         if (amenity) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setForm({ name: amenity.name, description: amenity.description })
         } else {
             setForm({ name: '', description: '' })
