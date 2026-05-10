@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { amenitiesService } from '../services/amenities.service'
 import  ConfirmDialog  from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
+import AmenityModal from '../components/AmenityModal'
 
 function AmenitiesPage() {
     const [amenities, setAmenities] = useState([])
@@ -10,7 +11,8 @@ function AmenitiesPage() {
     const [confirmOpen, setConfirmOpen] = useState(false)
     const [selectedAmenity, setSelectedAmenity] = useState(null)
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' })
-
+    const [modalOpen, setModalOpen] = useState(false)
+    const [editingAmenity, setEditingAmenity] = useState(null)
     const showToast = (message, type = 'success') => {
     setToast({ isVisible: true, message, type })
     }
@@ -37,6 +39,34 @@ function AmenitiesPage() {
         })
     }
 
+    const handleNewClick = () => {
+        setModalOpen(true)
+        setEditingAmenity(null)
+    }
+    
+    const handleEditClick = (amenity) => {
+        setModalOpen(true)
+        setEditingAmenity(amenity)
+    }
+
+    const handleSubmit = (formData) => {
+        if (editingAmenity) {
+            amenitiesService.update(editingAmenity.id, formData)
+            .then(() => {
+            setAmenities(amenities.map(a => a.id === editingAmenity.id ? { ...a, ...formData } : a))
+            setModalOpen(false)
+            showToast(`"${editingAmenity.name}" Edita correctamente`)
+        })
+        } else {
+            amenitiesService.create(formData)
+                .then((newAmenity) => {
+                    setAmenities([...amenities, newAmenity])
+                    setModalOpen(false)
+                    showToast(`"${formData.name}" Creada correctamente`)
+                })
+        }
+    }
+
     useEffect(() => {
         amenitiesService.getAll()
         .then(data => setAmenities(data))
@@ -57,7 +87,7 @@ function AmenitiesPage() {
                         {amenities.length} registros
                     </span>
                 </h1>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+                <button onClick={handleNewClick} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
                     + Nueva amenidad
                 </button>
             </div>
@@ -88,7 +118,9 @@ function AmenitiesPage() {
                         </div>
                         
                         <div className="flex gap-2">
-                            <button className="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-md hover:bg-gray-50">
+                            <button 
+                                onClick={() => handleEditClick(amenity)}
+                                className="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-md hover:bg-gray-50">
                                 ✎ Editar
                             </button>
                             <button
@@ -115,6 +147,12 @@ function AmenitiesPage() {
                 message={toast.message}
                 type={toast.type}
                 onClose={() => setToast(t => ({ ...t, isVisible: false }))}
+            />
+            <AmenityModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSubmit={handleSubmit}
+                amenity={editingAmenity}
             />
         </div>
     )
