@@ -2,9 +2,8 @@ import { api } from './api'
 
 export const ownersService = {
 
-    getAll: () => {
-
-        return api('/owners')
+    getAll: (page = 1, limit = 10) => {
+        return api(`/owners?page=${page}&limit=${limit}`)
     },
 
     getById: (id) => {
