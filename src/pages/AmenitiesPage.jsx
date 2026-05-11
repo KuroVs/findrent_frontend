@@ -52,17 +52,23 @@ function AmenitiesPage() {
     const handleSubmit = (formData) => {
         if (editingAmenity) {
             amenitiesService.update(editingAmenity.id, formData)
-            .then(() => {
-            setAmenities(amenities.map(a => a.id === editingAmenity.id ? { ...a, ...formData } : a))
-            setModalOpen(false)
-            showToast(`"${editingAmenity.name}" Edita correctamente`)
-        })
+                .then(() => {
+                    setAmenities(amenities.map(a => a.id === editingAmenity.id ? { ...a, ...formData } : a))
+                    setModalOpen(false)
+                    showToast(`"${editingAmenity.name}" editada correctamente`)
+                })
+                .catch((err) => {
+                    showToast(err.message || 'Error al actualizar la amenidad', 'error')
+                })
         } else {
             amenitiesService.create(formData)
                 .then((newAmenity) => {
                     setAmenities([...amenities, newAmenity])
                     setModalOpen(false)
-                    showToast(`"${formData.name}" Creada correctamente`)
+                    showToast(`"${formData.name}" creada correctamente`)
+                })
+                .catch((err) => {
+                    showToast(err.message || 'Error al crear la amenidad', 'error')
                 })
         }
     }
