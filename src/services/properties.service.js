@@ -2,8 +2,8 @@ import { api } from './api'
 
 export const propertiesService = {
 
-    getAll: (filters = {}) => {
-        const params = new URLSearchParams(filters)
+    getAll: (page = 1, filters = {}) => {
+        const params = new URLSearchParams({ page, ...filters })
         return api(`/properties?${params}`)
     },
 
