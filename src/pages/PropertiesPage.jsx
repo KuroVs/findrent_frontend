@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { propertiesService } from '../services/properties.service'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
+import PropertyModal from '../components/PropertyModal'
 
 function PropertiesPage() {
 
@@ -62,10 +63,30 @@ function PropertiesPage() {
     }
 
     const handleSubmit = (formData) => {
+
+        const { amenities, ...propertyData } = formData
+        const amenityIds = amenities.map(a => a.id)
+        
+
         if (editingProperty) {
-            propertiesService.update(editingProperty.id, formData)
+            propertiesService.update(editingProperty.id, propertyData)
                 .then(() => {
-                    setProperties(properties.map(o => o.id === editingProperty.id ? { ...o, ...formData } : o))
+                    // Eliminar amenidades actuales
+                    const removePromises = (editingProperty.amenities || []).map(a =>
+                        propertiesService.removeAmenity(editingProperty.id, a.id)
+                    )
+                    return Promise.all(removePromises)
+                })
+                .then(() => {
+                    // Agregar las nuevas
+                    if (amenityIds.length > 0) {
+                        return propertiesService.addAmenities(editingProperty.id, amenityIds)
+                    }
+                })
+                .then(() => propertiesService.getById(editingProperty.id))
+                .then((updated) => {
+                    setProperties(properties.map(o => o.id === editingProperty.id ? updated : o))
+                    setActiveProperty(updated)
                     setModalOpen(false)
                     showToast(`"${editingProperty.title}" actualizado correctamente`)
                 })
@@ -73,14 +94,21 @@ function PropertiesPage() {
                     showToast(err.message || 'Error al actualizar la propiedad', 'error')
                 })
         } else {
-            propertiesService.create(formData)
-                .then((newOwner) => {
-                    setProperties([...properties, newOwner])
+            propertiesService.create(propertyData)
+                .then((newProperty) => {
+                    if (amenityIds.length > 0) {
+                        return propertiesService.addAmenities(newProperty.id, amenityIds)
+                            .then(() => propertiesService.getById(newProperty.id))
+                    }
+                    return newProperty
+                })
+                .then((newProperty) => {
+                    setProperties([...properties, newProperty])
                     setModalOpen(false)
                     showToast(`"${formData.title}" creado correctamente`)
                 })
                 .catch((err) => {
-                    showToast(err.message || 'Error al crear el propietario', 'error')
+                    showToast(err.message || 'Error al crear la propiedad', 'error')
                 })
         }
     }
@@ -93,7 +121,7 @@ function PropertiesPage() {
     const totalCount = properties.length
     const activeCount = properties.filter(p => p.is_active == true).length
     const avgPrice = properties.length > 0
-        ? properties.reduce((sum, p) => sum + p.price, 0) / properties.length
+        ? properties.reduce((sum, p) => sum + parseFloat(p.price), 0) / properties.length
         : 0
     const uniqueCities = [...new Set(properties.map(p => p.city))].length
 
@@ -376,6 +404,12 @@ function PropertiesPage() {
                 message={toast.message}
                 type={toast.type}
                 onClose={() => setToast(t => ({ ...t, isVisible: false }))}
+            />
+            <PropertyModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSubmit={handleSubmit}
+                property={editingProperty}
             />
         </div>
 )
