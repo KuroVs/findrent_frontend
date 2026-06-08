@@ -17,8 +17,8 @@ function PropertiesPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [activeProperty, setActiveProperty] = useState(null) // propiedad seleccionada en el panel
-    const [filters, setFilters] = useState({ city: '', min_price: '', max_price: '', bedrooms: '', bathrooms: '' })
-    const [appliedFilters, setAppliedFilters] = useState({ city: '', min_price: '', max_price: '', bedrooms: '', bathrooms: '' })
+    const [filters, setFilters] = useState({ city: '', min_price: '', max_price: '', bedrooms: '', bathrooms: '', operation_type: ''})
+    const [appliedFilters, setAppliedFilters] = useState({ city: '', min_price: '', max_price: '', bedrooms: '', bathrooms: '', operation_type: ''})
 
 
     const handleSearch = () => {
@@ -132,7 +132,7 @@ function PropertiesPage() {
                 setProperties(response.data)
                 setTotalPages(response.totalPages)
             })
-            .catch(() => setError('No se pudieron cargar los propietarios'))
+            .catch(() => setError('No se pudieron cargar las propiedades'))
             .finally(() => setLoading(false))
     }, [currentPage,appliedFilters])
 
@@ -140,7 +140,6 @@ function PropertiesPage() {
     if (error) return <p className="p-6 text-red-500">{error}</p>
 
     return (
-
         <div className="p-6">
 
             {/* Header */}
@@ -160,7 +159,7 @@ function PropertiesPage() {
             </div>
 
             {/* Estadísticas */}
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
                     <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Total</p>
                     <p className="text-2xl font-bold text-gray-900">{totalCount}</p>
@@ -172,7 +171,7 @@ function PropertiesPage() {
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
                     <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Precio promedio</p>
                     <p className="text-2xl font-bold text-blue-600">
-                        ${Math.round(avgPrice).toLocaleString('es-CO')}
+                        ${(avgPrice / 1000000).toFixed(1)}M
                     </p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -183,7 +182,7 @@ function PropertiesPage() {
 
             {/* Filtros */}
             <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
-                <div className="grid grid-cols-6 gap-3 items-end">
+                <div className="grid grid-cols-2 lg:grid-cols-7 gap-3 items-end">
                     <div>
                         <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Ciudad</p>
                         <input
@@ -229,6 +228,26 @@ function PropertiesPage() {
                             placeholder="Ej: 1"
                         />
                     </div>
+                    <div>
+                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
+                            Operación
+                        </p>
+
+                        <select
+                            value={filters.operation_type}
+                            onChange={e =>
+                                setFilters({
+                                    ...filters,
+                                    operation_type: e.target.value
+                                })
+                            }
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                        >
+                            <option value="">Todas</option>
+                            <option value="SALE">Venta</option>
+                            <option value="RENT">Arriendo</option>
+                        </select>
+                    </div>
                     <button
                         onClick={handleSearch}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
@@ -239,7 +258,7 @@ function PropertiesPage() {
             </div>
 
             {/* Layout principal */}
-            <div className={`grid gap-6 ${activeProperty ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            <div className={`grid gap-6 ${activeProperty ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
 
                 {/* Lista de cards */}
                 <div className="flex flex-col gap-3">
@@ -257,9 +276,31 @@ function PropertiesPage() {
                             <div className="p-4">
                                 <div className="flex justify-between items-start mb-2">
                                     <p className="font-semibold text-gray-900">{property.title}</p>
-                                    <span className="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full">
-                                        {property.is_active ? 'Activa' : 'Inactiva'}
-                                    </span>
+
+                                    <div className="flex gap-2">
+                                        <span
+                                            className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border ${
+                                                property.operation_type === 'SALE'
+                                                    ? 'bg-orange-100 text-orange-700 border-orange-300'
+                                                    : 'bg-blue-100 text-blue-700 border-blue-300'
+                                            }`}
+                                        >
+
+                                            {property.operation_type === 'SALE'
+                                                ? 'Venta'
+                                                : 'Arriendo'}
+                                        </span>
+
+                                        <span
+                                            className={`text-xs px-2 py-1 rounded-full ${
+                                                property.is_active
+                                                    ? 'bg-green-50 text-green-600'
+                                                    : 'bg-red-50 text-red-600'
+                                            }`}
+                                        >
+                                            {property.is_active ? 'Activa' : 'Inactiva'}
+                                        </span>
+                                    </div>
                                 </div>
                                 <p className="text-xs text-gray-500 mb-3">
                                     📍 {property.city} · {property.bedrooms} hab · {property.bathrooms} baños · {property.area_m2}m²
@@ -309,87 +350,111 @@ function PropertiesPage() {
 
                 {/* Panel de detalle */}
                 {activeProperty && (
-                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden h-fit sticky top-6">
-                        <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-400" />
-                        <div className="p-6">
-                            <div className="flex justify-between items-start mb-2">
-                                <div>
-                                    <h2 className="text-lg font-bold text-gray-900">{activeProperty.title}</h2>
-                                    <p className="text-sm text-gray-500">📍 {activeProperty.address} · {activeProperty.city}</p>
+                    <>
+                        <div
+                            className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+                            onClick={() => setActiveProperty(null)}
+                        />
+                        <div className="fixed bottom-0 left-0 right-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl lg:static lg:z-auto lg:rounded-xl lg:max-h-none lg:overflow-visible bg-white border border-gray-200 lg:h-fit lg:sticky lg:top-6">
+                            <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-400" />
+                            <div className="p-6">
+                                <div className="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-900">{activeProperty.title}</h2>
+                                        <p className="text-sm text-gray-500">📍 {activeProperty.address} · {activeProperty.city}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setActiveProperty(null)}
+                                        className="text-gray-400 hover:text-gray-600 text-lg"
+                                    >✕</button>
                                 </div>
-                                <button
-                                    onClick={() => setActiveProperty(null)}
-                                    className="text-gray-400 hover:text-gray-600 text-lg"
-                                >✕</button>
-                            </div>
 
-                            <p className="text-3xl font-extrabold text-blue-600 mb-5">
-                                ${activeProperty.price.toLocaleString('es-CO')}
-                                <span className="text-sm font-normal text-gray-400 ml-1">/ mes</span>
-                            </p>
+                                <p className="text-3xl font-extrabold text-blue-600 mb-5">
+                                    ${activeProperty.price.toLocaleString('es-CO')}
+                                    <span className="text-sm font-normal text-gray-400 ml-1">/ mes</span>
+                                </p>
 
-                            <div className="grid grid-cols-3 gap-3 mb-5">
-                                <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                    <p className="text-xl font-bold text-gray-900">{activeProperty.bedrooms}</p>
-                                    <p className="text-xs text-gray-400">Habitaciones</p>
-                                </div>
-                                <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                    <p className="text-xl font-bold text-gray-900">{activeProperty.bathrooms}</p>
-                                    <p className="text-xs text-gray-400">Baños</p>
-                                </div>
-                                <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                    <p className="text-xl font-bold text-gray-900">{activeProperty.area_m2}</p>
-                                    <p className="text-xs text-gray-400">m²</p>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Propietario</p>
-                                    <p className="text-sm font-medium text-gray-900">
-                                        {activeProperty.owner?.full_name} {activeProperty.owner?.last_name}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Estado</p>
-                                    <span className="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full">
-                                        {activeProperty.is_active ? 'Activa' : 'Inactiva'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {activeProperty.description && (
-                                <div className="mb-4">
-                                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Descripción</p>
-                                    <p className="text-sm text-gray-600 leading-relaxed">{activeProperty.description}</p>
-                                </div>
-                            )}
-
-                            {activeProperty.amenities?.length > 0 && (
-                                <div className="mb-5">
-                                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Amenidades</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {activeProperty.amenities.map(a => (
-                                            <span key={a.id} className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full border border-blue-100">
-                                                {a.name}
-                                            </span>
-                                        ))}
+                                <div className="grid grid-cols-3 gap-3 mb-5">
+                                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-xl font-bold text-gray-900">{activeProperty.bedrooms}</p>
+                                        <p className="text-xs text-gray-400">Habitaciones</p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-xl font-bold text-gray-900">{activeProperty.bathrooms}</p>
+                                        <p className="text-xs text-gray-400">Baños</p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-xl font-bold text-gray-900">{activeProperty.area_m2}</p>
+                                        <p className="text-xs text-gray-400">m²</p>
                                     </div>
                                 </div>
-                            )}
 
-                            <div className="flex gap-3 pt-4 border-t border-gray-100">
-                                <button
-                                    onClick={() => handleEditClick(activeProperty)}
-                                    className="flex-1 border border-gray-200 text-gray-600 py-2 rounded-lg text-sm hover:bg-gray-50"
-                                >✎ Editar</button>
-                                <button
-                                    onClick={() => handleDeleteClick(activeProperty)}
-                                    className="flex-1 border border-red-200 text-red-500 py-2 rounded-lg text-sm hover:bg-red-50"
-                                >✕ Eliminar</button>
+                                <div className="grid grid-cols-3 gap-4 mb-4">
+                                    <div>
+                                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Propietario</p>
+                                        <p className="text-sm font-medium text-gray-900">
+                                            {activeProperty.owner?.full_name} {activeProperty.owner?.last_name}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Estado</p>
+                                        <span className="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full">
+                                            {activeProperty.is_active ? 'Activa' : 'Inactiva'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
+                                            Tipo de Operación
+                                        </p>
+
+                                        <span
+                                            className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border ${
+                                                activeProperty.operation_type === 'SALE'
+                                                    ? 'bg-orange-100 text-orange-700 border-orange-300'
+                                                    : 'bg-blue-100 text-blue-700 border-blue-300'
+                                            }`}
+                                        >
+
+                                            {activeProperty.operation_type === 'SALE'
+                                                ? 'Venta'
+                                                : 'Arriendo'}
+                                        </span>
+                                    </div>                                    
+                                </div>
+
+                                {activeProperty.description && (
+                                    <div className="mb-4">
+                                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Descripción</p>
+                                        <p className="text-sm text-gray-600 leading-relaxed">{activeProperty.description}</p>
+                                    </div>
+                                )}
+
+                                {activeProperty.amenities?.length > 0 && (
+                                    <div className="mb-5">
+                                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Amenidades</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {activeProperty.amenities.map(a => (
+                                                <span key={a.id} className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full border border-blue-100">
+                                                    {a.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="flex gap-3 pt-4 border-t border-gray-100">
+                                    <button
+                                        onClick={() => handleEditClick(activeProperty)}
+                                        className="flex-1 border border-gray-200 text-gray-600 py-2 rounded-lg text-sm hover:bg-gray-50"
+                                    >✎ Editar</button>
+                                    <button
+                                        onClick={() => handleDeleteClick(activeProperty)}
+                                        className="flex-1 border border-red-200 text-red-500 py-2 rounded-lg text-sm hover:bg-red-50"
+                                    >✕ Eliminar</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </>
                 )}
             </div>
 
@@ -412,7 +477,7 @@ function PropertiesPage() {
                 property={editingProperty}
             />
         </div>
-)
+    )
 }
 
 export default PropertiesPage

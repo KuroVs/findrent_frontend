@@ -121,19 +121,22 @@ function AmenitiesPage() {
                         <div className="flex-1">
                             <span className="font-medium text-sm text-gray-900">{amenity.name}</span>
                             <span className="text-xs text-gray-500 ml-2">{amenity.description}</span>
+                            
                         </div>
                         
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => handleEditClick(amenity)}
                                 className="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-md hover:bg-gray-50">
-                                ✎ Editar
+                                <span className="hidden sm:inline">✎ Editar</span>
+                                <span className="sm:hidden">✎</span>
                             </button>
                             <button
                                 onClick={() => handleDeleteClick(amenity)}
                                 className="text-xs border border-red-200 text-red-500 px-3 py-1 rounded-md hover:bg-red-50"
                             >
-                                ✕ Eliminar
+                                <span className="hidden sm:inline">✕ Eliminar</span>
+                                <span className="sm:hidden">✕</span>
                             </button>
                         </div>
                     </div>

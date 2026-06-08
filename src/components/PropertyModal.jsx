@@ -5,7 +5,7 @@ import { amenitiesService } from '../services/amenities.service'
 
 function PropertyModal({ isOpen, onClose, onSubmit, property }) {
 
-    const [form, setForm] = useState({ owner_id: ' ', title: '', description: '', price: 0, city: '', address: '',area_m2: 0.0, bedrooms: 0, bathrooms: 0, is_active: true, amenities: []})
+    const [form, setForm] = useState({ owner_id: '', title: '', description: '', price: 0, city: '', address: '',area_m2: 0.0, bedrooms: 0, bathrooms: 0, is_active: true,operation_type: '', amenities: []})
 
         // Estados para las listas
     const [owners, setOwners] = useState([])
@@ -21,14 +21,14 @@ function PropertyModal({ isOpen, onClose, onSubmit, property }) {
     }, [])
 
     useEffect(() => {
-        console.log('property recibida:', property)
+        
         if (property) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setForm({ owner_id: property.owner?.id, title: property.title, description: property.description, price: property.price, city: property.city,
-                address: property.address, bedrooms: property.bedrooms, bathrooms: property.bathrooms, is_active: property.is_active, amenities: property.amenities, area_m2: property.area_m2 })
+                address: property.address, bedrooms: property.bedrooms, bathrooms: property.bathrooms, is_active: property.is_active, operation_type: property.operation_type, amenities: property.amenities, area_m2: property.area_m2 })
         } else {
             setForm({ owner_id: '', title: '', description: '', price: 0, city: '',
-                address: '', bedrooms: 0, bathrooms: 0,area_m2: 0.0, is_active: true, amenities: []})
+                address: '', bedrooms: 0, bathrooms: 0,area_m2: 0.0, is_active: true,operation_type: '', amenities: []})
         }
     }, [property, isOpen])
 
@@ -47,6 +47,7 @@ function PropertyModal({ isOpen, onClose, onSubmit, property }) {
         if (!form.city.trim()) return
         if (!form.bedrooms) return
         if (!form.bathrooms) return
+        if (!form.operation_type) return
         onSubmit(form)
     }
 
@@ -101,6 +102,21 @@ function PropertyModal({ isOpen, onClose, onSubmit, property }) {
                         <input name="address" value={form.address} onChange={handleChange}
                             className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                             placeholder="Ej: Calle 10 # 43-12" />
+                    </div>
+
+                    {/* Operación */}
+                    <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Operación</label>
+                        <select
+                            name="operation_type"
+                            value={form.operation_type}
+                            onChange={handleChange}
+                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                        >
+                            <option value="">Seleccionar...</option>
+                            <option value="SALE">Venta</option>
+                            <option value="RENT">Arriendo</option>
+                        </select>
                     </div>
 
                     {/* Habitaciones */}

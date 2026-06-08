@@ -1,0 +1,30 @@
+<svg width="200" height="48" viewBox="0 0 200 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ícono -->
+  <rect width="48" height="48" rx="13" fill="#4f6ef7"/>
+  <!-- Edificio izquierdo -->
+  <rect x="6" y="16" width="13" height="26" rx="2" fill="white"/>
+  <rect x="8" y="19" width="3.5" height="3.5" rx="0.8" fill="#4f6ef7"/>
+  <rect x="13.5" y="19" width="3.5" height="3.5" rx="0.8" fill="#4f6ef7"/>
+  <rect x="8" y="25" width="3.5" height="3.5" rx="0.8" fill="#4f6ef7"/>
+  <rect x="13.5" y="25" width="3.5" height="3.5" rx="0.8" fill="#4f6ef7"/>
+  <!-- Edificio derecho -->
+  <rect x="22" y="9" width="14" height="33" rx="2" fill="white" opacity="0.85"/>
+  <!-- F -->
+  <rect x="24" y="13" width="2.5" height="11" rx="0.8" fill="#4f6ef7"/>
+  <rect x="24" y="13" width="6" height="2.5" rx="0.8" fill="#4f6ef7"/>
+  <rect x="24" y="18" width="5" height="2.5" rx="0.8" fill="#4f6ef7"/>
+  <!-- R -->
+  <rect x="31" y="13" width="2.5" height="11" rx="0.8" fill="#4f6ef7"/>
+  <rect x="31" y="13" width="5.5" height="2.5" rx="0.8" fill="#4f6ef7"/>
+  <rect x="31" y="18" width="5.5" height="2.5" rx="0.8" fill="#4f6ef7"/>
+  <path d="M33.5 20.5L37.5 24" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round"/>
+  <rect x="36" y="13" width="2.5" height="7.5" rx="1.2" fill="#4f6ef7"/>
+  <!-- Ventanas bajas -->
+  <rect x="24" y="28" width="3.5" height="3.5" rx="0.8" fill="#4f6ef7"/>
+  <rect x="29.5" y="28" width="3.5" height="3.5" rx="0.8" fill="#4f6ef7"/>
+  <rect x="34.5" y="28" width="2" height="3.5" rx="0.8" fill="#4f6ef7"/>
+
+  <!-- Texto -->
+  <text x="60" y="30" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="800" fill="#111827" letter-spacing="-0.5">FindRent</text>
+  <text x="60" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#9ca3af" letter-spacing="2">GESTIÓN INMOBILIARIA</text>
+</svg>

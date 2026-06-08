@@ -6,19 +6,26 @@ const names = [
     { path: '/amenities', label: 'Amenidades' },
 ]
 
-
-function Header() {
+function Header({ onMenuClick }) {
     const location = useLocation()
     const currentPage = names.find(link => link.path === location.pathname)
 
     return (
-        <header className="flex items-center justify-between px-6 h-14 bg-white shrink-0 border-b border-gray-300">
-            <div>
-                
-                <div className="text-sm font-medium text-gray-800"> {currentPage?.label}</div>
-                <div className="text-xs text-gray-400">FindRent /  {currentPage?.label}</div>
-                
-                    
+        <header className="flex items-center justify-between px-4 h-14 bg-white shrink-0 border-b border-gray-300">
+            <div className="flex items-center gap-3">
+                {/* Botón hamburguesa - solo visible en mobile */}
+                <button
+                    onClick={onMenuClick}
+                    className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+                >
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M2 4h14M2 9h14M2 14h14" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                </button>
+                <div>
+                    <div className="text-sm font-medium text-gray-800">{currentPage?.label}</div>
+                    <div className="text-xs text-gray-400">FindRent / {currentPage?.label}</div>
+                </div>
             </div>
             <div className="flex items-center gap-3">
                 <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-600">

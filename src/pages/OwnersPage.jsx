@@ -106,7 +106,8 @@ function OwnersPage() {
                 </button>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            {/* Tabla — solo desktop */}
+            <div className="hidden lg:block bg-white border border-gray-200 rounded-xl overflow-hidden">
                 <div className="grid grid-cols-6 px-4 py-2 bg-gray-50 border-b border-gray-200 gap-3">
                     <span className="col-span-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Nombre</span>
                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Documento</span>
@@ -114,7 +115,6 @@ function OwnersPage() {
                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Teléfono</span>
                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wider text-right">Acciones</span>
                 </div>
-
                 {owners.map((owner, index) => (
                     <div
                         key={owner.id}
@@ -129,16 +129,41 @@ function OwnersPage() {
                         <p className="text-sm text-gray-500 truncate">{owner.email}</p>
                         <p className="text-sm text-gray-500">{owner.phone}</p>
                         <div className="flex gap-2 justify-end">
-                            <button
-                                onClick={() => handleEditClick(owner)}
-                                className="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-md hover:bg-gray-50"
-                            >
+                            <button onClick={() => handleEditClick(owner)}
+                                className="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-md hover:bg-gray-50">
                                 ✎ Editar
                             </button>
-                            <button
-                                onClick={() => handleDeleteClick(owner)}
-                                className="text-xs border border-red-200 text-red-500 px-3 py-1 rounded-md hover:bg-red-50"
-                            >
+                            <button onClick={() => handleDeleteClick(owner)}
+                                className="text-xs border border-red-200 text-red-500 px-3 py-1 rounded-md hover:bg-red-50">
+                                ✕ Eliminar
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Cards — solo mobile */}
+            <div className="lg:hidden flex flex-col gap-3">
+                {owners.map(owner => (
+                    <div key={owner.id} className="bg-white border border-gray-200 rounded-xl p-4">
+                        <div className="flex justify-between items-start mb-2">
+                            <div>
+                                <p className="font-medium text-gray-900">{owner.full_name} {owner.last_name}</p>
+                                <p className="text-xs text-gray-500 mt-1">{owner.type_document} · {owner.number_document}</p>
+                            </div>
+                            <span className="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full">Activo</span>
+                        </div>
+                        <div className="flex flex-col gap-1 mb-3">
+                            <p className="text-xs text-gray-500">✉ {owner.email}</p>
+                            <p className="text-xs text-gray-500">📞 {owner.phone}</p>
+                        </div>
+                        <div className="flex gap-2 pt-3 border-t border-gray-100">
+                            <button onClick={() => handleEditClick(owner)}
+                                className="flex-1 text-xs border border-gray-200 text-gray-500 py-2 rounded-lg hover:bg-gray-50">
+                                ✎ Editar
+                            </button>
+                            <button onClick={() => handleDeleteClick(owner)}
+                                className="flex-1 text-xs border border-red-200 text-red-500 py-2 rounded-lg hover:bg-red-50">
                                 ✕ Eliminar
                             </button>
                         </div>
