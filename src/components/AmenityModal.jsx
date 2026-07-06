@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 function AmenityModal({ isOpen, onClose, onSubmit, amenity }) {
     const [form, setForm] = useState({ name: '', description: '' })
+    const [errors, setErrors] = useState({})
 
     useEffect(() => {
         if (amenity) {
@@ -10,6 +11,7 @@ function AmenityModal({ isOpen, onClose, onSubmit, amenity }) {
         } else {
             setForm({ name: '', description: '' })
         }
+        setErrors({})
     }, [amenity, isOpen])
 
     if (!isOpen) return null
@@ -18,10 +20,18 @@ function AmenityModal({ isOpen, onClose, onSubmit, amenity }) {
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value })
+        if (errors[e.target.name]) {
+            setErrors({ ...errors, [e.target.name]: null })
+        }
     }
 
     const handleSubmit = () => {
-        if (!form.name.trim()) return
+        const newErrors = {}
+        if (!form.name.trim()) newErrors.name = 'El nombre es obligatorio'
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            return
+        }
         onSubmit(form)
     }
 
@@ -33,15 +43,22 @@ function AmenityModal({ isOpen, onClose, onSubmit, amenity }) {
                 <div className="flex flex-col gap-4">
                     <div>
                         <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Nombre
+                            Nombre <span className="text-red-400">*</span>
                         </label>
                         <input
                             name="name"
                             value={form.name}
                             onChange={handleChange}
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                            className={`mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none ${
+                                errors.name
+                                    ? 'border-red-400 focus:border-red-400'
+                                    : 'border-gray-200 focus:border-blue-500'
+                            }`}
                             placeholder="Ej: Piscina"
                         />
+                        {errors.name && (
+                            <p className="text-xs text-red-400 mt-1">{errors.name}</p>
+                        )}
                     </div>
                     <div>
                         <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">

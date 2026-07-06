@@ -2,17 +2,13 @@ import { useEffect, useState } from 'react'
 import { ownersService } from '../services/owners.service'
 import { amenitiesService } from '../services/amenities.service'
 
-
 function PropertyModal({ isOpen, onClose, onSubmit, property }) {
 
-    const [form, setForm] = useState({ owner_id: '', title: '', description: '', price: 0, city: '', address: '',area_m2: 0.0, bedrooms: 0, bathrooms: 0, is_active: true,operation_type: '', amenities: []})
-
-        // Estados para las listas
+    const [form, setForm] = useState({ owner_id: '', title: '', description: '', price: 0, city: '', address: '', area_m2: 0.0, bedrooms: 0, bathrooms: 0, is_active: true, operation_type: '', amenities: [] })
+    const [errors, setErrors] = useState({})
     const [owners, setOwners] = useState([])
     const [amenitiesList, setAmenitiesList] = useState([])
 
-
-        // Carga owners y amenidades al montar
     useEffect(() => {
         ownersService.getAll()
             .then(res => setOwners(res.data))
@@ -21,38 +17,50 @@ function PropertyModal({ isOpen, onClose, onSubmit, property }) {
     }, [])
 
     useEffect(() => {
-        
         if (property) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            setForm({ owner_id: property.owner?.id, title: property.title, description: property.description, price: property.price, city: property.city,
-                address: property.address, bedrooms: property.bedrooms, bathrooms: property.bathrooms, is_active: property.is_active, operation_type: property.operation_type, amenities: property.amenities, area_m2: property.area_m2 })
+            setForm({ owner_id: property.owner?.id, title: property.title, description: property.description, price: property.price, city: property.city, address: property.address, bedrooms: property.bedrooms, bathrooms: property.bathrooms, is_active: property.is_active, operation_type: property.operation_type, amenities: property.amenities, area_m2: property.area_m2 })
         } else {
-            setForm({ owner_id: '', title: '', description: '', price: 0, city: '',
-                address: '', bedrooms: 0, bathrooms: 0,area_m2: 0.0, is_active: true,operation_type: '', amenities: []})
+            setForm({ owner_id: '', title: '', description: '', price: 0, city: '', address: '', bedrooms: 0, bathrooms: 0, area_m2: 0.0, is_active: true, operation_type: '', amenities: [] })
         }
+        setErrors({})
     }, [property, isOpen])
 
     if (!isOpen) return null
 
-    const title = property ? 'Editar Propiedad' : 'Nuevo Propiedad'
+    const title = property ? 'Editar Propiedad' : 'Nueva Propiedad'
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value })
+        if (errors[e.target.name]) {
+            setErrors({ ...errors, [e.target.name]: null })
+        }
     }
 
     const handleSubmit = () => {
-        if (!form.title.trim()) return
-        if (!form.owner_id) return
-        if (!form.price) return
-        if (!form.city.trim()) return
-        if (!form.bedrooms) return
-        if (!form.bathrooms) return
-        if (!form.operation_type) return
+        const newErrors = {}
+        if (!form.title.trim()) newErrors.title = 'El título es obligatorio'
+        if (!form.owner_id) newErrors.owner_id = 'Selecciona un propietario'
+        if (!form.price || form.price <= 0) newErrors.price = 'El precio debe ser mayor a 0'
+        if (!form.city.trim()) newErrors.city = 'La ciudad es obligatoria'
+        if (!form.operation_type) newErrors.operation_type = 'Selecciona un tipo de operación'
+        if (!form.bedrooms || form.bedrooms <= 0) newErrors.bedrooms = 'Requerido'
+        if (!form.bathrooms || form.bathrooms <= 0) newErrors.bathrooms = 'Requerido'
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            return
+        }
         onSubmit(form)
     }
 
-    return (
+    const inputClass = (field) =>
+        `mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none ${
+            errors[field]
+                ? 'border-red-400 focus:border-red-400'
+                : 'border-gray-200 focus:border-blue-500'
+        }`
 
+    return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto">
                 <h2 className="text-lg font-semibold mb-4">{title}</h2>
@@ -60,17 +68,22 @@ function PropertyModal({ isOpen, onClose, onSubmit, property }) {
                 <div className="grid grid-cols-2 gap-4">
                     {/* Título */}
                     <div className="col-span-2">
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Título</label>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Título <span className="text-red-400">*</span>
+                        </label>
                         <input name="title" value={form.title} onChange={handleChange}
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                            className={inputClass('title')}
                             placeholder="Ej: Apartamento en El Poblado" />
+                        {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title}</p>}
                     </div>
 
                     {/* Propietario */}
                     <div className="col-span-2">
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Propietario</label>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Propietario <span className="text-red-400">*</span>
+                        </label>
                         <select name="owner_id" value={form.owner_id} onChange={handleChange}
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                            className={inputClass('owner_id')}>
                             <option value="">Seleccionar propietario...</option>
                             {owners.map(owner => (
                                 <option key={owner.id} value={owner.id}>
@@ -78,68 +91,80 @@ function PropertyModal({ isOpen, onClose, onSubmit, property }) {
                                 </option>
                             ))}
                         </select>
+                        {errors.owner_id && <p className="text-xs text-red-400 mt-1">{errors.owner_id}</p>}
                     </div>
 
                     {/* Precio */}
                     <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</label>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Precio <span className="text-red-400">*</span>
+                        </label>
                         <input name="price" value={form.price} onChange={handleChange} type="number"
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                            className={inputClass('price')}
                             placeholder="Ej: 2500000" />
+                        {errors.price && <p className="text-xs text-red-400 mt-1">{errors.price}</p>}
                     </div>
 
                     {/* Ciudad */}
                     <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Ciudad</label>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Ciudad <span className="text-red-400">*</span>
+                        </label>
                         <input name="city" value={form.city} onChange={handleChange}
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                            className={inputClass('city')}
                             placeholder="Ej: Medellín" />
+                        {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city}</p>}
                     </div>
 
                     {/* Dirección */}
                     <div className="col-span-2">
                         <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</label>
                         <input name="address" value={form.address} onChange={handleChange}
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                            className={inputClass('address')}
                             placeholder="Ej: Calle 10 # 43-12" />
                     </div>
 
-                    {/* Operación */}
+                    {/* Tipo de Operación */}
                     <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Operación</label>
-                        <select
-                            name="operation_type"
-                            value={form.operation_type}
-                            onChange={handleChange}
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-                        >
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tipo de Operación <span className="text-red-400">*</span>
+                        </label>
+                        <select name="operation_type" value={form.operation_type} onChange={handleChange}
+                            className={inputClass('operation_type')}>
                             <option value="">Seleccionar...</option>
                             <option value="SALE">Venta</option>
                             <option value="RENT">Arriendo</option>
                         </select>
+                        {errors.operation_type && <p className="text-xs text-red-400 mt-1">{errors.operation_type}</p>}
                     </div>
 
                     {/* Habitaciones */}
                     <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Habitaciones</label>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Habitaciones <span className="text-red-400">*</span>
+                        </label>
                         <input name="bedrooms" value={form.bedrooms} onChange={handleChange} type="number"
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                            className={inputClass('bedrooms')}
                             placeholder="Ej: 3" />
+                        {errors.bedrooms && <p className="text-xs text-red-400 mt-1">{errors.bedrooms}</p>}
                     </div>
 
                     {/* Baños */}
                     <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Baños</label>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Baños <span className="text-red-400">*</span>
+                        </label>
                         <input name="bathrooms" value={form.bathrooms} onChange={handleChange} type="number"
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                            className={inputClass('bathrooms')}
                             placeholder="Ej: 2" />
+                        {errors.bathrooms && <p className="text-xs text-red-400 mt-1">{errors.bathrooms}</p>}
                     </div>
 
                     {/* Área */}
                     <div>
                         <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Área m²</label>
                         <input name="area_m2" value={form.area_m2} onChange={handleChange} type="number"
-                            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                            className={inputClass('area_m2')}
                             placeholder="Ej: 95" />
                     </div>
 
@@ -202,6 +227,7 @@ function PropertyModal({ isOpen, onClose, onSubmit, property }) {
                 </div>
             </div>
         </div>
-)
+    )
 }
+
 export default PropertyModal
